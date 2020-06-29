@@ -19,16 +19,12 @@
   }
 
   </style> 
-  <header>
-    
-  </header>
 
-  <h1>
-  
-  </h1>
+
+ 
 
   <section class="make-center">
-      <p style="margin: 0; padding: 0; padding-bottom: 20px;">
+   
           <div class="make-center">
           <input type="text" id="broadcast-id" value="room-xyz" autocorrect=off autocapitalize=off size=20>
           <button id="open-or-join">Criar ou Conectar</button>
@@ -36,7 +32,7 @@
           <div class="make-center" id="broadcast-viewers-counter"></div>
       </p>
 
-      <video id="video-preview" controls loop></video>
+      <video id="video-preview" autoplay="true" controls loop></video>
   </section>
 
 <script src="/dist/RTCMultiConnection.min.js"></script>
@@ -349,7 +345,7 @@ txtBroadcastId.onkeyup = txtBroadcastId.oninput = txtBroadcastId.onpaste = funct
 connection.onNumberOfBroadcastViewersUpdated = function(event) {
     if (!connection.isInitiator) return;
 
-    document.getElementById('broadcast-viewers-counter').innerHTML = 'Number of broadcast viewers: <b>' + event.numberOfBroadcastViewers + '</b>';
+    document.getElementById('broadcast-viewers-counter').innerHTML = 'Usuários conectados: <b>' + event.numberOfBroadcastViewers + '</b>';
 };
 </script>
 
