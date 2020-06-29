@@ -18,7 +18,129 @@
   
   }
 
+  div.select {
+            display: inline-block;
+            margin: 0 0 1em 0;
+        }
+
+        p.small {
+            font-size: 0.7em;
+        }
+
+        label {
+            width: 12em;
+            display: inline-block;
+        }
+
   </style> 
+  <script>
+  
+const videoElement = document.querySelector('video');
+const audioInputSelect = document.querySelector('select#audioSource');
+const audioOutputSelect = document.querySelector('select#audioOutput');
+const videoSelect = document.querySelector('select#videoSource');
+const selectors = [audioInputSelect, audioOutputSelect, videoSelect];
+
+audioOutputSelect.disabled = !('sinkId' in HTMLMediaElement.prototype);
+
+function gotDevices(deviceInfos) {
+  // Handles being called several times to update labels. Preserve values.
+  const values = selectors.map(select => select.value);
+  selectors.forEach(select => {
+    while (select.firstChild) {
+      select.removeChild(select.firstChild);
+    }
+  });
+  for (let i = 0; i !== deviceInfos.length; ++i) {
+    const deviceInfo = deviceInfos[i];
+    const option = document.createElement('option');
+    option.value = deviceInfo.deviceId;
+    if (deviceInfo.kind === 'audioinput') {
+      option.text = deviceInfo.label || `microphone ${audioInputSelect.length + 1}`;
+      audioInputSelect.appendChild(option);
+    } else if (deviceInfo.kind === 'audiooutput') {
+      option.text = deviceInfo.label || `speaker ${audioOutputSelect.length + 1}`;
+      audioOutputSelect.appendChild(option);
+    } else if (deviceInfo.kind === 'videoinput') {
+      option.text = deviceInfo.label || `camera ${videoSelect.length + 1}`;
+      videoSelect.appendChild(option);
+    } else {
+      console.log('Some other kind of source/device: ', deviceInfo);
+    }
+  }
+  selectors.forEach((select, selectorIndex) => {
+    if (Array.prototype.slice.call(select.childNodes).some(n => n.value === values[selectorIndex])) {
+      select.value = values[selectorIndex];
+    }
+  });
+}
+
+navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
+
+// Attach audio output device to video element using device/sink ID.
+function attachSinkId(element, sinkId) {
+  if (typeof element.sinkId !== 'undefined') {
+    element.setSinkId(sinkId)
+        .then(() => {
+          console.log(`Success, audio output device attached: ${sinkId}`);
+        })
+        .catch(error => {
+          let errorMessage = error;
+          if (error.name === 'SecurityError') {
+            errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
+          }
+          console.error(errorMessage);
+          // Jump back to first output device in the list as it's the default.
+          audioOutputSelect.selectedIndex = 0;
+        });
+  } else {
+    console.warn('Browser does not support output device selection.');
+  }
+}
+
+function changeAudioDestination() {
+  const audioDestination = audioOutputSelect.value;
+  attachSinkId(videoElement, audioDestination);
+}
+
+function gotStream(stream) {
+  window.stream = stream; // make stream available to console
+  videoElement.srcObject = stream;
+  // Refresh button list in case labels have become available
+  return navigator.mediaDevices.enumerateDevices();
+}
+
+function handleError(error) {
+  console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
+}
+
+function start() {
+  if (window.stream) {
+    window.stream.getTracks().forEach(track => {
+      track.stop();
+    });
+  }
+  const audioSource = audioInputSelect.value;
+  const videoSource = videoSelect.value;
+  const constraints = {
+    audio: {deviceId: audioSource ? {exact: audioSource} : undefined},
+    video: {deviceId: videoSource ? {exact: videoSource} : undefined}
+  };
+  navigator.mediaDevices.getUserMedia(constraints).then(gotStream).then(gotDevices).catch(handleError);
+}
+
+audioInputSelect.onchange = start;
+audioOutputSelect.onchange = changeAudioDestination;
+
+videoSelect.onchange = start;
+
+start();
+  
+  
+  
+  
+  
+  </script>
 
 
  
@@ -27,14 +149,18 @@
    <video id="video-preview" autoplay="true" poster="https://1.bp.blogspot.com/-ZVBBRdx-7MI/XqONsJ8Bv-I/AAAAAAAA5A8/Ta-1zRU6knU-sSp88QhIoUdw3AGhbatXACLcBGAsYHQ/s1600/logo%2Bchat-Recuperado.png" controls loop></video>
   <center>
           <div class="make-center">
-          <div class="select">
-        <label for="videoSource">Video source: </label><select id="videoSource"><option value="3ba3a980b3422d98a525bcf0573eec5732f64da37d3c0267a81820d7f5a55b32">USB2.0 HD UVC WebCam (13d3:56dd)</option><option value="5388e1c12b0f4c761b2442112698092c1cd165dcbaf3788f1e45cbf8cff57406">Snap Camera</option><option value="4baba503eec9500d5977638776d5c12dd12e2083f04bc319959d1ea565ee77a8">NewTek NDI Video</option><option value="ad7c71571fc7aafb79f12bfb0240875430002b3112942653180fa9ee01e88c1f">Insta Device (2)</option><option value="34ff939aadda1fe63603e0d8f01d6e501ccffd440308ee154884e3706210ec0c">OBS-Camera</option><option value="f934214287f8825a1eb757cd16ac06a598c8ec270a95c4ac80fd5e7ee8aa8b65">OBS-Camera2</option><option value="85252cde9ade745ec26bb8543edfb916d4e186e568196d38b3a331a6d76cd516">OBS-Camera3</option><option value="9def4224cabb37ac6003b3c63a778415dbef44d691cc53832d146e56f62d778b">OBS-Camera4</option><option value="a59e3a87237f704c9e746e5cdbbc43df2d7b13dbd8585ee0bedb477200f18f13">Decklink Video Capture</option><option value="cdfe4ef7500d5e34f0f07f11bb2c54e22ec89269c596460bfcbcd1586eaf1849">vMix Video</option><option value="0a44ee9a930fb7f6eed3b9d916782c06af0c42c6140e8fa117c91d24b6ce3661">vMix Video External 2</option><option value="db2fb286d1972d59394a5cc0de91bc6750bc219b277a39daf4182ed69711a50f">vMix Video YV12</option><option value="523537f75cc54ca84fd019e39bad68ff3ef7370ff3627b7aaf97a3dc6bb542cb">vMix Video External 2 YV12</option></select>
-       
-        <label for="audioSource">Audio input source: </label><select id="audioSource"><option value="default">Padrão - Line 1 (Virtual Audio Cable)</option><option value="communications">Comunicações - Line 1 (Virtual Audio Cable)</option><option value="b040dd3f540fc6015300a6746d617da07c378006cc00542c48607d61c7b916da">Linha (NewTek NDI Audio)</option><option value="90036cc9a64e2cd8cfe5fc8b0c3ac631ec8b98aa74494c1ea182bb10940ab9c5">Microfone (Realtek(R) Audio)</option><option value="b9d8dae5cd47f95148fda4514e92d2aa299c3fd52c82ec71a12e4398e19de29a">Line 1 (Virtual Audio Cable)</option></select>
-    
-        
-        <label for="audioOutput">Audio output destination: </label><select id="audioOutput"><option value="default">Padrão - Alto-falantes (Realtek(R) Audio)</option><option value="communications">Comunicações - Line 1 (Virtual Audio Cable)</option><option value="608069940e61b8c06a8417264718dbaa7f58f22785201d93b390d117b1ddc8e3">Alto-falantes (Realtek(R) Audio)</option><option value="998dffd58a318469dcda9dc419e8e331064071b3bcc20821ed1938ccdc11a62c">Line 1 (Virtual Audio Cable)</option></select>
-    </div>   
+       <div class="select">
+        <label for="audioSource">Audio input source: </label><select id="audioSource"></select>
+    </div>
+
+    <div class="select">
+        <label for="audioOutput">Audio output destination: </label><select id="audioOutput"></select>
+    </div>
+
+    <div class="select">
+        <label for="videoSource">Video source: </label><select id="videoSource"></select>
+    </div>
+
     
     
     </div>
