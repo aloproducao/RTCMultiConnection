@@ -64,9 +64,9 @@ var connection = new RTCMultiConnection();
 connection.socketURL = '/';
 
 // comment-out below line if you do not have your own socket.io server
- connection.socketURL = 'https://rtc.navve.tv:443/';
+// connection.socketURL = 'https://rtc.navve.tv:443/';
 
-connection.socketMessageEvent = 'audio-conference-demo';
+connection.socketMessageEvent = 'audio-conference';
 
 connection.session = {
     audio: true,
