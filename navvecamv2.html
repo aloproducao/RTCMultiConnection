@@ -298,6 +298,10 @@ document.getElementById('open-or-join').onclick = function() {
     height: { min: 240, ideal: 720, max: 1080 }
   }
 
+  connection.sdpConstraints.mandatory = {
+    OfferToReceiveAudio: true,
+    OfferToReceiveVideo: true
+};
 
     connection.getSocket(function(socket) {
         socket.emit('check-broadcast-presence', broadcastId, function(isBroadcastExists) {
