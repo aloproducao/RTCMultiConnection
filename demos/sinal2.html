@@ -3,8 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>navve.rtc</title>
-  <input type="file" accept="image/*;capture=camera">
-  <input type="file" accept="audio/*;capture=microphone">
+
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <link rel="shortcut icon" href="/demos/logo.png">
@@ -27,13 +26,14 @@
  
 
   <section class="make-center">
-   <video id="video-preview" autoplay="true" poster="https://1.bp.blogspot.com/-ZVBBRdx-7MI/XqONsJ8Bv-I/AAAAAAAA5A8/Ta-1zRU6knU-sSp88QhIoUdw3AGhbatXACLcBGAsYHQ/s1600/logo%2Bchat-Recuperado.png" controls loop></video>
+   <video id="video-preview"  allow="geolocation; microphone; camera" allowfullscreen autoplay="true" poster="https://1.bp.blogspot.com/-ZVBBRdx-7MI/XqONsJ8Bv-I/AAAAAAAA5A8/Ta-1zRU6knU-sSp88QhIoUdw3AGhbatXACLcBGAsYHQ/s1600/logo%2Bchat-Recuperado.png" controls loop></video>
   <center>
           <div class="make-center">
           
           <input type="text" id="broadcast-id" value="navve" autocorrect=off autocapitalize=off size=20>
-          <button id="open-or-join">Criar ou Conectar</button>
+          <button  id="open-or-join">Criar ou Conectar</button>
           <div class="make-center" id="broadcast-viewers-counter"></div>
+            
     
 </center>
       </section>
